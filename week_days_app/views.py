@@ -1,7 +1,7 @@
 from typing import List, Any
 
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 import re
 
 # Create your views here.
@@ -18,22 +18,17 @@ week_days_info_data = {
 }
 
 
-def validation_str(url: str) -> bool:
-    return isinstance(url, str) and url in week_days_info_data
-
-
-def validation_int(url: str) -> bool:
-    return len(re.findall(r'\b[1-7]', url)) > 0
-
-
-def give_info_about_days(requst, current_day: str | int):
-    if validation_str(current_day):
-        return HttpResponse(f"{week_days_info_data[current_day]}")
-    elif validation_int(current_day):
-        return HttpResponse(f"{list(week_days_info_data)[int(current_day) - 1]}")
+def give_info_about_days(request, current_day_stry: str):
+    info = week_days_info_data.get(current_day_stry, 0)
+    if info:
+        return HttpResponse(week_days_info_data[current_day_stry])
     else:
-        return HttpResponseNotFound(f"{current_day} - такая страница не найдена ;с")
+        return HttpResponseNotFound(f"Мы не знамем такую страницу ;с  {current_day_stry}")
 
 
 def current_day_int_info(request, current_day_digit):
-    return HttpResponse(f"Вы ввели число, а я это отловил хихихихих")
+    if 8 > current_day_digit > 0:
+        return HttpResponseRedirect(f'/week_days/{list(week_days_info_data)[current_day_digit - 1]}')
+    else:
+        return HttpResponseNotFound(f"Мы не день под таким числом ( доступен ввод от 1 до 7 ) , вы ввели - {current_day_digit}")
+
