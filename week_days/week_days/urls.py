@@ -20,3 +20,4 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('week_days/', include('week_days_app.url'))
 ]
+
